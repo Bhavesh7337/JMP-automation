@@ -1,0 +1,12 @@
+openai
+langchain
+pywin32
+streamlit
+python-dotenv
+pandas
+numpy
+requests
+streamlit
+chromadb
+tiktoken
+pymupdf

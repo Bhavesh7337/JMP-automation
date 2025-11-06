@@ -1,0 +1,99 @@
+###############################################
+# JMP JSL Syntax Reference Snippets
+# These examples are real, runnable JSL patterns.
+# The AI should copy their structure and capitalization.
+###############################################
+
+### 1. Open a dataset
+dt = Open("C:/path/to/your_dataset.csv");
+
+### 2. Graph Builder - Scatter Plot
+Graph Builder(
+    Size( 534, 400 ),
+    Show Control Panel( 0 ),
+    Variables(
+        X( :temperature ),
+        Y( :efficiency )
+    ),
+    Elements(
+        Points( X, Y )
+    )
+);
+
+### 3. Graph Builder - Overlay by Group
+Graph Builder(
+    Size( 534, 400 ),
+    Show Control Panel( 0 ),
+    Variables(
+        X( :temperature ),
+        Y( :efficiency ),
+        Overlay( :batch )
+    ),
+    Elements(
+        Points( X, Y )
+    )
+);
+
+### 4. Distribution (Histogram)
+Distribution(
+    Continuous Distribution( Column( :efficiency ) ),
+    By( :batch )
+);
+
+### 5. Bivariate (Scatter + Fit Line)
+Bivariate(
+    Y( :efficiency ),
+    X( :temperature ),
+    Fit Line()
+);
+
+### 6. Fit Model (Regression)
+Fit Model(
+    Y( :efficiency ),
+    Effects( :temperature, :voltage ),
+    Personality( "Standard Least Squares" ),
+    Emphasis( "Effect Leverage" ),
+    Run Model()
+);
+
+### 7. Oneway (ANOVA)
+Oneway(
+    Y( :efficiency ),
+    X( :batch ),
+    Means and Std Dev(),
+    Comparisons Control( "Batch 1" )
+);
+
+### 8. Summary Table
+dt_summary = dt << Summary(
+    Group( :batch ),
+    Mean( :efficiency ),
+    Std Dev( :efficiency )
+);
+
+### 9. New Column and Formula
+dt << New Column( "Normalized Efficiency",
+    Numeric,
+    Continuous,
+    Formula( :efficiency / Col Mean( :efficiency ) )
+);
+
+### 10. Sort Table
+dt_sorted = dt << Sort(
+    By( :temperature ),
+    Order( Ascending )
+);
+
+### 11. Save and Close
+dt << Save( "C:/path/to/saved_dataset.jmp" );
+dt << Close Window();
+
+###############################################
+# Notes for AI model:
+# - Always start with dt = Open("<absolute path>");
+# - End every statement with a semicolon.
+# - Capitalization matters (Graph Builder, Fit Model, etc.).
+# - Use colon ":" before column names.
+# - Use "<<" for sending messages to tables.
+# - Keep syntax clean and executable, no markdown or prose.
+###############################################

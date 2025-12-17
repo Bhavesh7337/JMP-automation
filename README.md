@@ -3,6 +3,7 @@ JMP Copilot
 AI assistant that converts plain English into runnable JMP Scripting Language (JSL) and executes it directly in JMP.
 Includes a JSL-specific prompt evaluation framework with risk scoring, failure logging, self-patching, and before/after behavioral diffs for prompt iteration.
 
+_______________________________________________________________________________________________
 Highlights
 
 Natural language → JSL
@@ -19,7 +20,7 @@ Behavioral tests, hallucination detection, clarification checks, structural vali
 
 Prompt diffing
 Compare two evaluation runs to see behavioral changes (risk ↓, hallucination ↓, clarification ↑) with visual summaries.
-
+_______________________________________________________________________________________________
 Project Layout (Key Components)
 app/
 ├── ai_engine.py            # Base GPT-4o JSL generator (no RAG)
@@ -34,6 +35,7 @@ app/
 ├── prompt_eval_diff.py     # Streamlit before/after behavioral diff
 data/                       # Sample or uploaded CSVs (git-ignored)
 output/                     # Generated JSL + eval reports (git-ignored)
+_______________________________________________________________________________________________
 
 Setup
 Clone & Install
@@ -46,6 +48,7 @@ Environment
 Create a .env file:
 
 OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxx
+_______________________________________________________________________________________________
 
 (Optional) Build RAG Index
 
@@ -57,6 +60,7 @@ python app/rag_build_index.py "path/to/JSL_Manual.pdf"
 This creates:
 
 app/rag_index/
+_______________________________________________________________________________________________
 
 Run the App
 Streamlit UI
@@ -74,6 +78,7 @@ python app/main.py
 
 
 Uses the base ai_engine. Adjust prompt, data path, and columns directly in the file.
+_______________________________________________________________________________________________
 
 Prompt Evaluation (JSL-Only)
 Run Evaluation + Save Report
@@ -137,6 +142,7 @@ Clarification rate
 Per-category sparklines
 
 Failure comparisons (post-prompt change)
+_______________________________________________________________________________________________
 
 How It Works (High-Level Flow)
 

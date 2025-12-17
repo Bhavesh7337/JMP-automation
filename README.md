@@ -1,140 +1,166 @@
 JMP Copilot
-AI-Powered Assistant for Generating and Running JMP Scripts
 
-JMP Copilot transforms natural-language instructions into JSL (JMP Scripting Language) code that can run directly inside JMP.
-It combines OpenAI GPT-4o for intelligent code generation with an optional RAG (Retrieval-Augmented Generation) engine that references your local JMP Scripting Manual for syntax-accurate, context-aware results.
+AI assistant that converts plain English into runnable JMP Scripting Language (JSL) and executes it directly in JMP.
+Includes a JSL-specific prompt evaluation framework with risk scoring, failure logging, self-patching, and before/after behavioral diffs for prompt iteration.
 
-The tool provides both a Streamlit web interface and a command-line workflow, letting you move seamlessly between experimenting and automation.
+Highlights
 
- Key Features
-Capability	Description
- Natural Language → JSL	Type “Create a histogram of efficiency by batch” — get runnable JSL instantly.
- Streamlit GUI	Interactive web app with dataset upload, prompt history, and one-click execution in JMP.
- RAG Engine (Optional)	Uses a local vector index built from your JSL documentation PDF for more reliable syntax.
- Direct JMP Integration	Sends generated JSL directly to JMP through COM automation.
- Hybrid Embeddings System	Auto-selects OpenAI embeddings if available, otherwise falls back to local Ollama (nomic-embed-text).
- Expandable Knowledge Base	Add more JSL examples or documentation snippets to continuously improve accuracy.
- Project Structure
-.
-├── app/
-│   ├── ai_engine.py          # Base GPT-4o JSL generator
-│   ├── rag_engine.py         # Hybrid RAG engine (OpenAI ↔ Ollama)
-│   ├── rag_build_index.py    # Build vector index from JSL manual
-│   ├── gui_streamlit.py      # Streamlit GUI
-│   ├── jmp_connector.py      # COM automation to run scripts in JMP
-│   ├── workflow.py           # CLI workflow logic
-│   └── utils.py              # Utility functions
-│
-├── data/                     # Uploaded or sample datasets (git-ignored)
-├── output/                   # Generated JSL scripts (git-ignored)
-├── .env                      # Environment variables (API keys, etc.)
-├── .gitignore
-├── requirements.txt
-└── README.md
+Natural language → JSL
+Describe plots or analyses in English and receive executable JSL.
 
-Setup & Installation
-1️⃣ Clone the repository
+Streamlit UI + CLI
+Upload a CSV or provide a local path, generate JSL, and send it to JMP.
+
+Optional RAG support
+Use a local JSL manual as retrieval context for more accurate syntax and APIs.
+
+Prompt evaluation suite (JSL-focused)
+Behavioral tests, hallucination detection, clarification checks, structural validation, risk scoring, failure corpus, and self-patch loop.
+
+Prompt diffing
+Compare two evaluation runs to see behavioral changes (risk ↓, hallucination ↓, clarification ↑) with visual summaries.
+
+Project Layout (Key Components)
+app/
+├── ai_engine.py            # Base GPT-4o JSL generator (no RAG)
+├── rag_engine.py           # RAG-augmented JSL generator
+├── rag_build_index.py      # Build vector index from JSL manual PDF
+├── gui_streamlit.py        # Streamlit UI
+├── workflow.py             # CLI workflow (generate + send to JMP)
+├── jmp_connector.py        # COM launcher for JMP with JSL file
+├── utils.py                # Small helpers
+├── prompt_eval_suite.py    # JSL behavioral evaluation runner
+├── prompt_eval_report.py   # Streamlit viewer for one eval report
+├── prompt_eval_diff.py     # Streamlit before/after behavioral diff
+data/                       # Sample or uploaded CSVs (git-ignored)
+output/                     # Generated JSL + eval reports (git-ignored)
+
+Setup
+Clone & Install
 git clone https://github.com/<your-username>/JMP-automation.git
 cd JMP-automation
-
-2️⃣ Install dependencies
 pip install -r requirements.txt
 
-3️⃣ Set up environment variables
+Environment
 
-Create a .env file in the project root:
+Create a .env file:
 
 OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxx
 
+(Optional) Build RAG Index
 
-(Optional) If you plan to use the fallback RAG mode without OpenAI embeddings, install and start Ollama:
-
-ollama pull nomic-embed-text
-ollama serve
-
- Building the RAG Index
-
-If you want to use RAG (context-aware JSL generation):
-
-Place your official JSL manual PDF in a known location.
-
-Run:
+Use your JSL manual (PDF) as retrieval context:
 
 python app/rag_build_index.py "path/to/JSL_Manual.pdf"
 
 
-This will create a vector database at app/rag_index/.
+This creates:
 
-Usage
-Run the Streamlit Interface
+app/rag_index/
+
+Run the App
+Streamlit UI
 streamlit run app/gui_streamlit.py
 
 
-Then open the provided URL in your browser.
-Upload a CSV dataset, type a natural-language instruction, and click 🧠 Generate JSL.
-You can also enable the RAG toggle to use the indexed documentation for more precise results.
+Upload a CSV or provide a local path
 
-When ready, click 🚀 Run in JMP to execute the generated script directly in your JMP instance.
+Enter a natural-language instruction
 
- Command-Line Mode
+Generate JSL and send it to JMP
 
-You can also generate JSL scripts from the terminal:
-
+CLI Demo
 python app/main.py
 
 
-(Note: the CLI workflow currently uses the base AI engine only.)
+Uses the base ai_engine. Adjust prompt, data path, and columns directly in the file.
 
- How It Works
+Prompt Evaluation (JSL-Only)
+Run Evaluation + Save Report
+python app/prompt_eval_suite.py \
+  --output-json output/prompt_eval_report.json \
+  --rag-index app/rag_index
 
-Prompt Interpretation → Your instruction and dataset details are passed to GPT-4o.
 
-RAG Retrieval (Optional) → The system retrieves relevant snippets from the indexed JSL manual.
+Optional:
 
-Code Generation → The model writes clean, executable JSL.
+--system-prompt <file_or_text>
 
-Execution → The JSL script is sent to JMP via COM automation or saved locally for later use.
+What It Checks
 
- Example
+Invented JMP APIs or columns
 
-Prompt:
+Clarification behavior on ambiguous prompts
 
-“Create a scatter plot of efficiency versus temperature and add a linear fit.”
+Prompt drift stability
 
-Generated JSL:
+Plain JSL output (no Markdown, no prose)
 
-dt = Open("D:/data/combined_data.csv");
-Graph Builder(
-    Variables( X(:temperature), Y(:efficiency) ),
-    Elements( Points(X, Y), Smoother(Order(1)) )
-);
+Structural validity (Open(), semicolons, runnable code)
 
- Future Enhancements
+Self-refinement after known failures
 
-🪄Auto-debugging by parsing JMP error logs and regenerating fixed JSL.
+Instruction hierarchy enforcement
 
- Inline visual previews of generated plots.
+RAG similarity & length deltas
 
- Fine-tuned small model for JSL syntax.
+Risk scoring
 
- Public web deployment (Streamlit Cloud / Render).
+Failures are logged to:
 
- Contributing
+output/failures.jsonl
 
-Pull requests are welcome!
-If you discover an issue or have an idea for improvement, open an issue with details.
 
- License
+If outputs indicate invention, a self-patch rerun is automatically reported.
 
-MIT License — see LICENSE
- for details.
+View Evaluation Results
+Single Report Viewer
+streamlit run app/prompt_eval_report.py
 
- Acknowledgements
 
-OpenAI GPT-4o for LLM generation.
+(Default: output/prompt_eval_report.json)
 
-LangChain & Chroma for RAG infrastructure.
+Before / After Prompt Diff
+streamlit run app/prompt_eval_diff.py
 
-Ollama (nomic-embed-text) for local embeddings.
 
-SAS JMP for its scripting interface that inspired this project.
+Upload two evaluation reports to see:
+
+Mean risk delta
+
+Pass-rate delta
+
+Hallucination rate (1 − hallucination pass rate)
+
+Clarification rate
+
+Per-category sparklines
+
+Failure comparisons (post-prompt change)
+
+How It Works (High-Level Flow)
+
+User prompt + dataset context → LLM (GPT-4o)
+
+(Optional) RAG retrieves relevant JSL manual snippets
+
+LLM generates plain JSL only
+
+Output is cleaned (no fences, valid paths, semicolons enforced)
+
+Script is saved to output/
+
+JMP is launched with the generated JSL
+
+-----------------------------------------------------------------------------------------------
+Troubleshooting
+_______________________________________________________________________________________________
+
+JMP path
+Update JMP_PATH in app/jmp_connector.py if JMP is installed elsewhere.
+
+Missing RAG index
+Either build it or run without --rag-index.
+
+Eval JSON not found
+Point the Streamlit viewers to the correct file path.

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 def get_column_names(csv_path: str):
-    """Return column names from a CSV file."""
+    """grab the header row from a csv (super basic)"""
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV not found at {csv_path}")
     try:
@@ -12,9 +12,9 @@ def get_column_names(csv_path: str):
         raise RuntimeError(f"Failed to read {csv_path}: {e}")
 
 def ensure_dir(path: str):
-    """Create a directory if it doesn't exist."""
+    """make a folder if it isn't there already"""
     os.makedirs(path, exist_ok=True)
 
 def log(message: str):
-    """Simple logger."""
+    """tiny logger because print() is fine"""
     print(f"[JMP Copilot] {message}")

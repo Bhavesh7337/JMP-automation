@@ -3,7 +3,7 @@ from ai_engine import prompt_to_jsl
 from jmp_connector import run_jsl_script
 
 def main():
-    """Main entry point for JMP Copilot."""
+    """tiny demo runner for JMP Copilot (nothing fancy)"""
    
     user_prompt = "Create a scatter plot of efficiency versus temperature"
     data_path = r"D:\AI and ML lrn\week 4\data\processed\combined_data.csv"
@@ -15,7 +15,7 @@ def main():
     print("\n Generated JSL Code:\n")
     print(jsl_code)
 
-    # --- Save script ---
+    # toss the script on disk
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
     jsl_path = os.path.join(output_dir, "generated_script.jsl")
@@ -24,7 +24,7 @@ def main():
         f.write(jsl_code)
     print(f"\n Saved JSL script at: {jsl_path}")
 
-    # --- Run it in JMP ---
+    # launch JMP with the script
     run_jsl_script(jsl_path)
 
     print("\n Done! Check JMP for your plot or analysis.")

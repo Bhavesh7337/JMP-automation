@@ -1,3 +1,7 @@
+"""
+rag_engine.py -> grabs RAG snippets and glues them into JSL generation. Kinda barebones.
+"""
+
 import os, re
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -18,6 +22,7 @@ load_dotenv()
 client = OpenAI()
 
 def _normalize_path_for_jmp(path: str) -> str:
+    # same path fixer as main engine
     return os.path.abspath(path).replace("\\", "/")
 
 def _sanitize_jsl(text: str) -> str:
@@ -36,6 +41,7 @@ def _looks_like_jsl(jsl: str) -> bool:
     return True
 
 def load_vectordb(persist_dir: str = "app/rag_index"):
+    # tiny wrapper so we don't repeat Chroma wiring
     embeddings = CustomOpenAIEmbeddings()
     return Chroma(persist_directory=persist_dir, embedding_function=embeddings)
 
@@ -61,7 +67,7 @@ Relevant documentation snippets:
 {retrieved}
     """.strip()
 
-    # Try twice with slight temperature bump on retry
+    # Try twice; second time loosen temp a smidge
     for attempt in range(2):
         resp = client.chat.completions.create(
             model="gpt-4o-mini",

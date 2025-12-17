@@ -1,16 +1,12 @@
 import subprocess
 import os
 
-# Path to your JMP executable — adjust this if your path differs
+# path to your JMP exe - change if yours is elsewhere
 JMP_PATH = r"C:\Program Files\JMP\JMPSTUDENT\19\jmp.exe"
 
 def run_jsl_script(jsl_path: str):
-    """
-    Execute a JSL script using JMP.
-
-    Parameters:
-    - jsl_path: The absolute path to the JSL script file.
-    """
+    """Fire a JSL script into JMP. Nothing fancy, just spawns the exe.
+    jsl_path = absolute path to the script."""
     if not os.path.exists(JMP_PATH):
         print(f" Error: JMP executable not found at: {JMP_PATH}")
         return
